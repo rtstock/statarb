@@ -1,0 +1,9 @@
+#C:\Batches\GitStuff\$work\correlation_sample.csv
+def importcsv():
+    print 'x'
+def findcorrelatedpairs():
+    import pandas as pd
+    myfile = 'C:\Batches\GitStuff\$work\correlation_sample.csv'
+    df = pd.read_csv(myfile)
+    print df
+    
