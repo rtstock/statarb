@@ -80,11 +80,15 @@ class find:
         b = self.setclassdictionaries(closepricesfilepath = closepricesfilepath,movingaveragewindow = movingaveragewindow,list_of_tickers=[ticker1,ticker2])
         df_extreme = self.PairRunningPctDiffDictionary[ticker1][ticker2].loc[self.PairRunningPctDiffDictionary[ticker1][ticker2].isin([0.0,1.0])].to_frame()
         print 'df_extreme',df_extreme
-
-        my_tradedate = df_extreme.iloc[len(df_extreme)-opportunitesback].name
-        my_triggervalue  = df_extreme[ticker2].iloc[len(df_extreme)-opportunitesback]
-        print 'latest opportunity', my_tradedate, my_triggervalue
-        self.testone(ticker1,ticker2,my_tradedate,my_triggervalue,maxgain)
+        for i in range(1,opportunitesback):
+            print '-------------------------------------------------'
+            print 'doing opportunity',i
+            my_tradedate = df_extreme.iloc[len(df_extreme)-i].name
+            print 'my_tradedate',my_tradedate
+            my_triggervalue  = df_extreme[ticker2].iloc[len(df_extreme)-i]
+            print 'my_triggervalue', my_triggervalue
+            print 'latest opportunity', my_tradedate, my_triggervalue
+            self.testone(ticker1,ticker2,my_tradedate,my_triggervalue,maxgain)
 
 ##        for idx ,row in self.PairRunningPctDiffDictionary['AAPL'].iterrows():
 ##            print idx, row['ABBV'], self.PairPricesDiffDictionary['AAPL']['ABBV'][idx]
@@ -141,26 +145,27 @@ class find:
         df1.to_csv(cachedfilepathname,columns=(list(df1.columns.values)))
 
     def testone(self,ticker1,ticker2,tradedate,triggervalue, maxgain=1000.0):
-        print ticker1,ticker2,tradedate,triggervalue
+        
+        #print ticker1,ticker2,tradedate,triggervalue
         df_closeprices = self.ClosePricesDataframe
-        print df_closeprices[[ticker1]][(df_closeprices.index == tradedate)][ticker1][0]
+        #print df_closeprices[[ticker1]][(df_closeprices.index == tradedate)][ticker1][0]
         #stop
         df_closeprices = df_closeprices[(df_closeprices.index >= tradedate)]
         #df_diffprices = self.PairPricesDiffDictionary[ticker1][ticker2]
         df2 = pd.DataFrame(index=df_closeprices.index.copy())
-        print '----------------- ++++'
+        #print '----------------- ++++'
         df_closeprices = df_closeprices[[ticker1,ticker2]]
         #print df
         opendiffprice = self.PairPricesDiffDictionary[ticker1][ticker2][tradedate]
-        print 'opendiffprice','xxx',opendiffprice
+        #print 'opendiffprice','xxx',opendiffprice
         
         columns = list(df_closeprices.columns.values)
-        print 'columns',columns
+        #print 'columns',columns
         df_openprices= df_closeprices.iloc[[0]]
-        print 'df_openprices', df_openprices
+        #print 'df_openprices', df_openprices
         df_openshares = 10000.0 / df_closeprices.iloc[[0]]
-        print 'df_openshares',df_openshares
-        print '--------------------------kkkk'
+        #print 'df_openshares',df_openshares
+        #print '--------------------------kkkk'
         #df_opendiffprice = df_diffprices.iloc[[0]][0]
         #print 'df_opendiffprice',df_opendiffprice
         
@@ -207,8 +212,12 @@ class find:
             #if idx > '2016-03-02':
             #        break
         #print '-------------------------------------------------'
+        print 'df_exittrade'
         df_exittrade = df_final[(df_final['02_pl'] >= maxgain)].iloc[:1]
-        print df_exittrade.iloc[0]
+        if len(df_exittrade) > 0:
+            print df_exittrade.iloc[0]
+        else:
+            print '.... no trade. find status.'
         return df_exittrade
 
         

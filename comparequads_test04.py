@@ -80,7 +80,8 @@ class find:
                  ):
 
         b1 = self.setclassdictionaries(list_of_tickersigns=list_of_tickersigns,closepricesfilepath = closepricesfilepath,fromdate=fromdate,todate=todate)
-        b2 = self.setdollarizedataframe()
+        b2 = self.setdollarweightdataframe(parvalue = 40000.0)
+        #b2 = self.setdollarizedataframe()
         #setbetahrdataframe_test
         #b2 = self.setbetahrdataframe_test(list_of_symbols=self.SymbolsList,closepricesfilepath = self.SaveCSVPathName,fromdate=fromdate,todate=todate)
         #b2 = self.setbetahrdictionary(list_of_symbols=self.SymbolsList,closepricesfilepath = self.SaveCSVPathName,fromdate=fromdate,todate=todate)
@@ -122,7 +123,7 @@ class find:
         
     def setclassdictionaries(self,list_of_tickersigns = [],closepricesfilepath = '',fromdate = '2017-01-01',todate = '2017-12-31'):
         print 'started def setclassdictionaries'
-        df_tickers = pd.DataFrame(list_of_tickersigns, columns = ['ticker','sign'])
+        df_tickers = pd.DataFrame(list_of_tickersigns, columns = ['ticker','sign','weight'])
         df_tickers.set_index("ticker", drop=True, inplace=True)
         self.TickerSignDataframe = df_tickers
         list_of_symbols = df_tickers.index.tolist()
@@ -156,7 +157,40 @@ class find:
         
         
         return True
+
+    def setdollarweightdataframe(self,parvalue = 10000.0):
+        df = self.ClosePricesDataframe
+
+        #33333
+
+        df_denominator = df.iloc[[0]]
+        #sum_of_prices = df_denominator.sum(axis=1).iloc[0] #jjjjj
+
+
+        list_of_dates = list(df.index)
+        list_of_dates_sorted = sorted(list_of_dates)
+        df2 = pd.DataFrame({'Date':list_of_dates_sorted})
+
+        #print 'df_denominator', df_denominator
         
+        df_openshares = parvalue / df_denominator * self.TickerSignDataframe['weight']
+        #print 'df_openshares',df_openshares
+        #stop
+        df_shares2 = df_openshares.append([df_openshares]*(len(df)-1),ignore_index=True)
+        #print 'df_shares2', df_shares2
+        #stop
+        df_shares3 = pd.concat([df2, df_shares2], axis=1)
+        df_shares3.set_index("Date", drop=True, inplace=True)
+        #print 'df_shares3',df_shares3
+        #stop
+        df_dollarized = self.ClosePricesDataframe.multiply(df_shares3, axis=1)
+        #print 'df_dollarized',df_dollarized
+        #stop
+        self.DollarizedComparisonDataframe = df_dollarized
+        #print 'df_dollarized',df_dollarized
+        #stop
+        return True
+    
     def setdollarizedataframe(self,parvalue = 10000.0, useopeningorclosinghedgeratio = 'opening'):
         df = self.ClosePricesDataframe
 
@@ -220,10 +254,10 @@ if __name__=='__main__':
     '''
 
     list_of_tickersigns = [
-         ['MSFT',1]
-        ,['AAPL',1]
-        ,['PCLN',1]
-        ,['AMZN',1]
+         ['MSFT',1,0.40]
+        ,['AAPL',-1,0.25]
+        ,['PCLN',-1,0.25]
+        ,['CSCO',1,0.10]
         ]
 
 ##    list_of_tickersigns = [

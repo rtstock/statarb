@@ -720,9 +720,9 @@ if __name__=='__main__':
     o = find(
             #symbols=['AAPL','TSLA','AMZN','MS','MSFT','BAC','CA','CHD']
               symbols=['AMZN','PCLN']
-            , fromdate='2015-09-30'
+            , fromdate='2016-09-30'
             , todate='2017-12-31'
-             , movingaveragewindow = 50
+             , movingaveragewindow = 70
             )
     ret = o.findopportunities()
     #o.getstatusofopentrade(ticker1='CA',ticker2='CHD',opportunitesback=2)
