@@ -99,24 +99,14 @@ class find:
                     print 'price',ticker2,self.ClosePricesDataframe[ticker2][1:]
                 #try:
                     df_check = self.PairRunningPctDiffDictionary[ticker1][ticker2]
-                    #df_check.plot.line()
-                    #plt.show()
-                    
-                    #stop
+
                     df_check = df_check[:len(df_check)-20]
-                    #print df_check
-                    #stop
                     df_extreme = df_check.loc[df_check.isin([0.0,1.0])].to_frame()
-                    #print df_extreme
                     for idx, row in df_extreme.iterrows():
                         print 'df_extreme', idx, ticker1,ticker2,row[ticker2]
                     myinput = raw_input("What do you want to do? type 'y' to show graph, enter to skip graph and continue...")
                     if myinput == 'y':
                         print ticker1,ticker2
-                        
-                        
-                        #df_0 = self.PairPricesDiffDictionary[ticker1][ticker2].to_frame('diff')
-                        #df_1 = self.PairMovingAverageDiffDictionary[ticker1][ticker2].to_frame('ma')
                         df_0 = pd.concat([
                             self.PairPricesDiffDictionary[ticker1][ticker2].to_frame('diff')
                             , self.PairMovingAverageDiffDictionary[ticker1][ticker2].to_frame('ma')
@@ -133,19 +123,6 @@ class find:
                         raw_input("Press Enter to continue...")
                     
                     
-                    
-##                    tradedate = df_extreme.iloc[len(df_extreme)-1].name
-##                    triggervalue = df_extreme.iloc[len(df_extreme)-1][ticker2]
-##                    print tradedate,triggervalue
-##                    df_status, exit_trade = self.testone(ticker1,ticker2,'2016-09-02',triggervalue, maxgain=1000.0)
-##                    print df_status
-##                    print exit_trade
-##                    stop
-                
-                    
-                    #print 'length of df_extreme',ticker1,ticker2,len(df_extreme)
-                #except Exception as e:
-                #    print 'error in findopportunities','could not find',ticker1,ticker2,'combination'
         stop
         #print 'df_extreme',df_extreme
         return True

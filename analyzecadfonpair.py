@@ -86,19 +86,19 @@ class analyze:
         test_null_hypothesis = cadf[0]
         five_percent_value = cadf[4]['5%']
         print ''
-        print test_null_hypothesis, 'must be less than',five_percent_value
+        print test_null_hypothesis, 'must be less than',five_percent_value,'to reject null hypothosis'
         mylist = [s1,s2,test_null_hypothesis]
-        with open(myfileanalyze, 'a') as myfile:
-            wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-            wr.writerow(mylist)
+        #with open(myfileanalyze, 'a') as myfile:
+        #    wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+        #    wr.writerow(mylist)
 
         if float(test_null_hypothesis) < float(five_percent_value):
 
             dict_a = {'s1':s1,'s2':s2,'correlation':c1,'test_null_hypothesis':test_null_hypothesis}
             list_of_dicts_result.append(dict_a)
-            print '   **** Yes, we can reject null hypothesis'
+            print '   **** Yes, we can reject null hypothesis and consider the pair to be cointegrated'
         else:
-            print '   No accept null hypothesis'
+            print '   No, we must accept the null hypothesis.  The pair does not show significant cointegration'
 
         
         #print 'cadf[1]',cadf[1]
@@ -154,6 +154,7 @@ class analyze:
 
 if __name__=='__main__':
     #pairlist = ['AAP','AAPL']
-    #pairlist = ['CA',     'CHD']
-    pairlist = ['PCLN','MSFT']
-    o = analyze(pairlist,'2015-09-30','2017-09-30',True)
+    #pairlist = ['CA','CHD']
+    pairlist = ['GOOG','GOOGL']
+    fromdate,todate = '2016-07-01','2017-08-05'
+    o = analyze(pairlist,fromdate,todate,False)

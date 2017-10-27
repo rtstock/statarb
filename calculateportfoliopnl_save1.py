@@ -73,12 +73,13 @@ class find:
 
     def __init__(self                 
                  , list_of_tickersigns=[]
+                 , closepricesfilepath = ''
                  , fromdate = '2017-01-01'
                  , todate = '2017-12-31'
                  , parvalue = 10000.0
                  ):
 
-        b1 = self.setclassdictionaries(list_of_tickersigns=list_of_tickersigns,fromdate=fromdate,todate=todate)
+        b1 = self.setclassdictionaries(list_of_tickersigns=list_of_tickersigns,closepricesfilepath = closepricesfilepath,fromdate=fromdate,todate=todate)
         b2 = self.setdollarweightdataframe(parvalue = parvalue)
         #b2 = self.setdollarizedataframe()
         #setbetahrdataframe_test
@@ -90,7 +91,7 @@ class find:
     
 
 
-    def runmyportfoliopnl(self,portfolioname='port1',showplot=True):
+    def runmyportfoliopnl(self,portfolioname='port1'):
         #ddddd    
         list_of_symbols = self.SymbolsList
         df_analyze1 = self.DollarizedComparisonDataframe
@@ -103,25 +104,24 @@ class find:
         
         df_b['sum'] = df_b.sum(axis=1)
 
-        #print df_b
+        print df_b
         #stop
         df_analyze2[portfolioname] = df_b['sum']
         #print 'df_analyze2',df_analyze2
-        if showplot==True:
-            df_title = self.TickerSignDataframe
-            df_title.reset_index(level=0, inplace=True)
-            mytitle = df_title.to_string(index=False,header=False) #header=False,
-            
-            df_analyze2max = df_analyze2.cummax()
-            df_analyze2min = df_analyze2.cummin()
-            
-            plt.plot(df_analyze2.index, df_analyze2[portfolioname], label=mytitle)
-            
-            plt.legend(fontsize=8) # using a size in points
-            plt.show()
-        return df_analyze2
-    
-    def setclassdictionaries(self,list_of_tickersigns = [],fromdate = '2017-01-01',todate = '2017-12-31'):
+        
+        mytitle = self.TickerSignDataframe.to_string(header=False) #header=False,
+        
+        df_analyze2max = df_analyze2.cummax()
+        df_analyze2min = df_analyze2.cummin()
+
+        #print 'df_analyze2.index', df_analyze2.index
+        #print 'df_analyze2[portfolioname]', df_analyze2[portfolioname]
+        plt.plot(df_analyze2.index, df_analyze2[portfolioname], label=mytitle)
+        
+        plt.legend(fontsize=8) # using a size in points
+        plt.show()
+        
+    def setclassdictionaries(self,list_of_tickersigns = [],closepricesfilepath = '',fromdate = '2017-01-01',todate = '2017-12-31'):
         print 'started def setclassdictionaries'
         df_tickers = pd.DataFrame(list_of_tickersigns, columns = ['ticker','sign','weight'])
         df_tickers.set_index("ticker", drop=True, inplace=True)
@@ -131,10 +131,18 @@ class find:
         list_of_signs = df_tickers['sign'].tolist()
         self.SignsList = list_of_signs
         
-        print 'go to pull prices'
-        import pullstackedprices as pp
-        df = pp.stockpricesstacked(symbols=list_of_symbols,fromdate = fromdate,todate = todate)
-        
+        if len(closepricesfilepath) == 0:
+            print 'go to pull prices'
+            import pullprices as pp
+            o = pp.pull()
+            o.setclassdataframes(symbols=list_of_symbols,fromdate = fromdate,todate = todate)
+            df = o.ClosePricesDataframe
+            self.SaveCSVPathName = o.SaveCSVPathName
+        else:
+            myfile = closepricesfilepath #'C:\Batches\GitStuff\$work\closeprices_sample.csv'
+            self.SaveCSVPathName = closepricesfilepath
+            df = pd.read_csv(myfile)
+            df.set_index("Date", drop=True, inplace=True)
             
         if len(list_of_tickersigns) == 0:
             columns = list(df.columns.values)
@@ -203,21 +211,37 @@ class find:
         
 if __name__=='__main__':
 
-
-
-##    list_of_tickersigns = [
-##         ['MSFT',1,0.25]
-##        ,['AAPL',1,0.25]
-##        ,['GOOG',1,0.25]
-##        ,['AMZN',1,0.25]
-##        ]
+    '''
+        list_of_signs = [
+                         ('a',[ 1, 1,-1,-1])
+                        ,('b',[-1, 1, 1,-1])
+                        ,('c',[-1,-1, 1, 1])
+                        ,('d',[ 1,-1,-1, 1])
+                        ,('e',[-1, 1,-1, 1])
+                        ,('f',[ 1,-1, 1,-1])
+                         ]
+    '''
 
     list_of_tickersigns = [
-         ['MS',1,1.0]
-        ,['BAC',1,1.0]
-        ,['C',-1,1.0]
-        ,['JPM',-1,1.0]
+         ['MSFT',1,0.25]
+        ,['AAPL',1,0.25]
+        ,['GOOG',1,0.25]
+        ,['AMZN',1,0.25]
+        #,['MCD',1,0.10]
         ]
+
+##    list_of_tickersigns = [
+##         ['MSFT',-1]
+##        ,['AAPL',-1]
+##        ,['CRM',-1]
+##        ,['BAC',-1]
+##        ,['C',-1]
+##        ,['PCLN',1]
+##        ,['AMZN',1]
+##        ,['GOOG',1]
+##        ,['JPM',1]
+##        ,['MS',1]        
+##        ]
 
     
     #list_of_tickersigns = [
@@ -237,7 +261,7 @@ if __name__=='__main__':
         #,['LUV',-1]        
         #]
     
-    o = find(list_of_tickersigns=list_of_tickersigns,fromdate='2014-01-01',todate='2017-12-31',parvalue=1000.0)
+    o = find(list_of_tickersigns=list_of_tickersigns,closepricesfilepath = '', fromdate='2006-01-01',todate='2017-12-31',parvalue=1000.0)
     
     o.runmyportfoliopnl(portfolioname='port1')
 

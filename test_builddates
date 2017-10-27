@@ -1,0 +1,2 @@
+import mytools as mt
+print mt.builddates('2015-01-01','2015-05-10')
